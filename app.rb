@@ -5,15 +5,36 @@ require './lib/hand'
 
 class RPS < Sinatra::Base
 
+  enable :sessions
+
   get '/' do
     erb :signup
   end
 
   post '/names' do
   	player_1 = Player.new(params[:player_1])
-  	player_2 = Player.new("The Computer")
-  	Game.create(player_1, player_2)
-  	redirect '/RPS'
+  	session[:me] = player_1
+  	#player_2 = Player.new("The Computer")
+  	if ObjectSpace.each_object(Game).to_a.empty?
+  		Game.create(session[:me])
+  		redirect '/wait'
+  	else
+  		Game.instance.add_player(session[:me])
+  		redirect '/RPS'
+  	end
+  end
+
+  get '/wait' do
+  	@player = session[:me]
+  	erb :waiting_room
+  end
+
+  post '/waiting_room' do
+  	if Game.instance.player_2 == nil
+  		redirect '/wait'
+  	else
+ 		redirect '/RPS' 		
+    end
   end
 
   get '/RPS' do
