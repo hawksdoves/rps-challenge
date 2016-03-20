@@ -16,7 +16,6 @@ class Player
 		@person
 	end
 
-
 	def assign_hand(hand)
 		@my_hand = hand
 	end

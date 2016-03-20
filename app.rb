@@ -1,7 +1,6 @@
 require 'sinatra/base'
 require './lib/player'
 require './lib/game'
-require './lib/hand'
 require './lib/a_round'
 
 class RPS < Sinatra::Base
@@ -48,22 +47,20 @@ class RPS < Sinatra::Base
   end
 
   post '/fight' do
-  	if (!session[:me].my_hand && Round.instance == nil) || Round.instance.hands.empty?	
+  	if (!session[:me].my_hand && Round.instance == nil) || Round.instance.hands.empty?
+  		Round.lets_play	  	
+  		session[:my_round] = Round.instance
 	  	session[:me].assign_hand(params[:choice])
-	  	Round.instance.hand_chosen(session[:me])
-	  	p "or stuck here"
+	  	session[:my_round].hand_chosen(session[:me])
 	  	redirect '/waiting_to_fight'
-	elsif !session[:me].my_hand && Round.instance.hands[0].name != session[:me].name
+	elsif !session[:me].my_hand && !!Round.instance
+		session[:my_round] = Round.instance
 		session[:me].assign_hand(params[:choice])
-	  	Round.instance.hand_chosen(session[:me])
+	  	session[:my_round].hand_chosen(session[:me])
 	  	redirect '/fight'
 	elsif !!session[:me].my_hand && Round.instance.hands.length ==2	
 		redirect '/fight'
-	else !!session[:me].my_hand && Round.instance.hands[0].name == session[:me].name
-		p "stuck here"
-		p session[:me]
-		p Round.instance.hands
-		p Round.instance
+	else 
 		redirect '/waiting_to_fight'
 	end
   end
@@ -74,14 +71,18 @@ class RPS < Sinatra::Base
   end
 
   get '/fight' do
-  	p session[:me]
-  	p Game.instance.player_2
   	Game.instance.find_winner(Round.instance.hands[0], Round.instance.hands[1])
   	@winner = Game.instance.winner
   	@my_hand = session[:me].my_hand
   	@my_opponents_hand = Round.instance.opponents_hand(session[:me]).my_hand
-  	p Round.instance.hands
+  	p session[:me]
+  	p Game.instance.player_2
+  	p Game.instance.player_1
+  	p Round.instance.object_id 
+  	p session[:my_round].hands
   	p @my_opponents_hand
+  	p Round.instance.object_id 
+  	p session[:my_round].object_id
   	erb :fight
   	
   end
@@ -90,14 +91,15 @@ class RPS < Sinatra::Base
   	if Round.instance.hands.length == 2
   		session[:me].assign_hand(nil)
   		Round.instance.hands.delete_if {|person| person.name == session[:me].name }
-  		p "break here"
+  		old_round = Round.instance
   		redirect 'reset'
-  	elsif !Round.instance.hands.empty? && session[:me].my_hand == nil
-  		p "or break here"
-  		p Round.instance
-  		redirect 'reset'
+  	elsif Round.instance.hands.length ==1 && old_round.object_id == Round.instance.object_id && session[:me].my_hand == nil
+  		p Round.instance  		
+ 
+  		redirect '/reset'
   	else
   		session[:me].assign_hand(nil)
+  		session[:my_round] = nil
   		Round.instance.hands.delete_if {|value| value.name == session[:me].name }
   		redirect '/RPS'
   	end 

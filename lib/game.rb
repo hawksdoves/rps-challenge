@@ -1,4 +1,5 @@
 require_relative 'player'
+
 class Game
 
 	attr_reader :player_1, :player_2
@@ -26,10 +27,6 @@ class Game
 		@winner 	
 	end 
 
-	# def hand_chosen(by_person)
-	# 	@hands << by_person
-	# end
-
 	def find_winner(player1_hand, player2_hand)
   		winning_moves = {
     					'Rock' => 'Scissors',
@@ -39,10 +36,5 @@ class Game
   		return @winner = 'Draw' if player1_hand.my_hand == player2_hand.my_hand
   		winning_moves[player1_hand.my_hand] == player2_hand.my_hand ? @winner = player1_hand.name : @winner = player2_hand.name
 	end
-
-	# def opponents_hand(is)
-	# 	  opponent_hand = @hands.select {|hand| hand.name != is.name }
-	# 	  opponent_hand[0]
-	# end
 
 end
