@@ -1,6 +1,6 @@
 <html style="text-align:center; font-family:tahoma"></html>
 <h1> <%= @my_hand %> vs <%= @my_opponents_hand %> </h1>
-<% if Game.instance.winner == 'Draw'%>
+<% if Game.instance.winner == 'Draw' %>
 <h2> It's a Draw! </h2>
 <% else %>
 <h2> <%= @winner %> is the winner! </h2>

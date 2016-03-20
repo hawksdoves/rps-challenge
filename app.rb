@@ -14,15 +14,16 @@ class RPS < Sinatra::Base
   end
 
   post '/names' do
-  	player = Player.new(params[:player1]) 
   	if ObjectSpace.each_object(Game).to_a.empty?
-  		Game.create(player)
+  		Player.define(params[:player1]) 
+  		Game.create(Player.instance)
 		session[:me] = Game.instance.player_1
   		redirect '/wait'
   	elsif Game.instance.player_1 == session[:me]
   		redirect '/wait'
   	else
-  		Game.instance.add_player(player)
+  		Player.define(params[:player1]) 
+  		Game.instance.add_player(Player.instance)
   		session[:me] = Game.instance.player_2
   		redirect '/RPS'
   	end
@@ -47,21 +48,22 @@ class RPS < Sinatra::Base
   end
 
   post '/fight' do
-  	if !session[:me].my_hand && Game.instance.hands.empty?
+  	if (!session[:me].my_hand && Round.instance == nil) || Round.instance.hands.empty?	
 	  	session[:me].assign_hand(params[:choice])
-	  	Game.instance.hand_chosen(session[:me])
+	  	Round.instance.hand_chosen(session[:me])
 	  	p "or stuck here"
 	  	redirect '/waiting_to_fight'
-	elsif !session[:me].my_hand && Game.instance.hands[0].name != session[:me].name
+	elsif !session[:me].my_hand && Round.instance.hands[0].name != session[:me].name
 		session[:me].assign_hand(params[:choice])
-	  	Game.instance.hand_chosen(session[:me])
+	  	Round.instance.hand_chosen(session[:me])
 	  	redirect '/fight'
-	elsif !!session[:me].my_hand && Game.instance.hands.length ==2	
+	elsif !!session[:me].my_hand && Round.instance.hands.length ==2	
 		redirect '/fight'
-	else !!session[:me].my_hand && Game.instance.hands[0].name == session[:me].name
+	else !!session[:me].my_hand && Round.instance.hands[0].name == session[:me].name
 		p "stuck here"
 		p session[:me]
-		p Game.instance.hands
+		p Round.instance.hands
+		p Round.instance
 		redirect '/waiting_to_fight'
 	end
   end
@@ -74,27 +76,29 @@ class RPS < Sinatra::Base
   get '/fight' do
   	p session[:me]
   	p Game.instance.player_2
-  	Game.instance.find_winner(Game.instance.hands[0], Game.instance.hands[1])
+  	Game.instance.find_winner(Round.instance.hands[0], Round.instance.hands[1])
   	@winner = Game.instance.winner
   	@my_hand = session[:me].my_hand
-  	p Game.instance.hands 	
-  	@my_opponents_hand = Game.instance.opponents_hand(session[:me]).my_hand
-  	p Game.instance.hands
+  	@my_opponents_hand = Round.instance.opponents_hand(session[:me]).my_hand
+  	p Round.instance.hands
   	p @my_opponents_hand
   	erb :fight
   	
   end
 
   post '/reset' do
-  	if Game.instance.hands.length == 2
+  	if Round.instance.hands.length == 2
   		session[:me].assign_hand(nil)
-  		Game.instance.hands.delete_if {|value| value.name == session[:me].name }
+  		Round.instance.hands.delete_if {|person| person.name == session[:me].name }
+  		p "break here"
   		redirect 'reset'
-  	elsif Game.instance.hands.length == 1 && session[:me].my_hand == nil
+  	elsif !Round.instance.hands.empty? && session[:me].my_hand == nil
+  		p "or break here"
+  		p Round.instance
   		redirect 'reset'
   	else
   		session[:me].assign_hand(nil)
-  		Game.instance.hands.delete_if {|value| value.name == session[:me].name }
+  		Round.instance.hands.delete_if {|value| value.name == session[:me].name }
   		redirect '/RPS'
   	end 
   end

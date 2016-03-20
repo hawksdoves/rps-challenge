@@ -4,6 +4,8 @@ require_relative 'hand'
 
 class Round 
 
+	attr_reader :hands
+
 	def initialize
 		@hands = Array.new
 	end
@@ -20,12 +22,12 @@ class Round
 		@hands << hand
 	end
 
-	def hands
-		@hands.dup
-	end	
+	# def hands
+	# 	@hands.dup
+	# end	
 
 	def opponents_hand(my_hand)
-		  opponent_hand = hands.select {|hand| hand != my_hand}
+		  opponent_hand = @hands.select {|hand| hand.name != my_hand.name }
 		  opponent_hand[0]
 	end
 
