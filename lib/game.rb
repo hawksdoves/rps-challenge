@@ -1,12 +1,13 @@
-
+require_relative 'player'
 class Game
 
-	attr_reader :player_1, :player_2, :current_player
+	attr_reader :player_1, :player_2, :hands
 
 	def initialize(player_1)
 		@player_1 = player_1
 		@player_2 = nil
-		@current_player = @player_1
+		@winner = nil
+		@hands = Array.new
 	end
 
 	def self.create(player_1)
@@ -21,11 +22,27 @@ class Game
 		@player_2 = player_2
 	end
 
-	def switch_player
-  		@current_player == @player_1 ? @current_player = @player_2 : @current_player = @player_1
-  	end
+	def winner
+		@winner 	
+	end 
 
-  	def current_opponent
-  		@current_player == @player_1 ? @player_2 : @player_1
-  	end
+	def hand_chosen(by_person)
+		@hands << by_person
+	end
+
+	def find_winner(player1_hand, player2_hand)
+  		winning_moves = {
+    					'Rock' => 'Scissors',
+    					'Scissors' => 'Paper',
+    					'Paper' => 'Rock'
+  										}  
+  		return @winner = 'Draw' if player1_hand.my_hand == player2_hand.my_hand
+  		winning_moves[player1_hand.my_hand] == player2_hand.my_hand ? @winner = player1_hand.name : @winner = player2_hand.name
+	end
+
+	def opponents_hand(is)
+		  opponent_hand = @hands.select {|hand| hand.name != is.name }
+		  opponent_hand[0]
+	end
+
 end

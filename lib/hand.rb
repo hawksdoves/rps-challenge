@@ -2,30 +2,23 @@ require_relative 'player'
 
 class Hand 
 
-	attr_reader :my_weapon, :opponent_weapon, :player1
+	attr_reader :my_weapon, :player
 
-	def initialize(my_weapon, player1)
-		@player1 = player1
+	def initialize(my_weapon, player)
 		@my_weapon = my_weapon
-		@opponent_weapon = nil
+		@player = player
 	end
 
-	def self.hand(my_weapon, player1)
-		@hand = Hand.new(my_weapon, player1)
+	def self.hand(my_weapon, player)
+		@hand = Hand.new(my_weapon, player)
 	end
 
 	def self.instance
 		@hand 
 	end
 
-	def winner
-  		winning_moves = {
-    					'Rock' => 'Scissors',
-    					'Scissors' => 'Paper',
-    					'Paper' => 'Rock'
-  										}  
-  		return 'Draw' if @my_weapon == @opponent_weapon
-  		winning_moves[@my_weapon] == @opponent_weapon ? @player1.name : "The Computer"
+	def reset_my_hand
+		@my_weapon = nil
 	end
 
 	def weapon		
