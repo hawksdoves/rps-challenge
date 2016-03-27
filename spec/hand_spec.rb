@@ -18,13 +18,14 @@ subject(:hand) {described_class.new("rock",player_1)}
 		it 'assigns which player\'s hand it is' do
 			expect(hand.player1).to eq player_1
 		end
+		
 	end
 
 	describe '#weapon' do
 		
 		it 'picks rock, paper or scissors' do
-			allow(Kernel).to receive(:rand).and_return(2)
-			expect(hand.weapon).to eq 'Paper'
+			allow(Hand::WEAPONS).to receive(:sample).and_return("Paper")
+			expect(hand.computer_weapon).to eq 'Paper'
 
 		end
 	end
@@ -32,9 +33,11 @@ subject(:hand) {described_class.new("rock",player_1)}
 	describe '#winner' do
 
 		it 'returns the winner\'s name' do
-			allow(Kernel).to receive(:rand).and_return(2)
-			hand.weapon
+			allow(Hand::WEAPONS).to receive(:sample).and_return("Paper")
+			hand.computer_weapon
 			expect(hand.winner).to eq 'The Computer'
 		end
+
 	end
+
 end

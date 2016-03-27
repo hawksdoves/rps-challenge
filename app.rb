@@ -1,35 +1,38 @@
 require 'sinatra/base'
 require './lib/player'
-require './lib/game'
-require './lib/hand'
+require './lib/computer'
+require './lib/weapon'
 
 class RPS < Sinatra::Base
+
+  enable :sessions
 
   get '/' do
     erb :signup
   end
 
   post '/names' do
-  	player_1 = Player.new(params[:player_1])
-  	player_2 = Player.new("The Computer")
-  	Game.create(player_1, player_2)
+  	session[:me] = params[:player_1]
   	redirect '/RPS'
   end
 
   get '/RPS' do
+    @me = session[:me]
   	erb :rockpaperscissors
   end
 
   post '/fight' do
-	my_weapon = params[:choice]
-	Hand.hand(my_weapon, Game.instance.player_1)
- 	Hand.instance.weapon
-	redirect '/fight'
+    player = Player.new(session[:me]) 
+  	player.chooses(params[:choice])  
+    @my_hand = player.weapon_choice.type
+    computer = Computer.new
+    computer.weapon
+    @opponents_hand = computer.weapon_choice
+    results = player.fights(computer)
+    erb results
   end
 
-  get '/fight' do
-  	erb :fight
-  end
+
 
   # start the server if ruby file executed directly
   run! if app_file == $0
