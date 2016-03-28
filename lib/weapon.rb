@@ -15,7 +15,7 @@ class Weapons
     					'Scissors' => 'Paper',
     					'Paper' => 'Rock'
   										} 
-		winning_moves[@type] == weapon
+		winning_moves[@type] == weapon.type
 	end
 
 end

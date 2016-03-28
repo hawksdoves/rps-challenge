@@ -27,7 +27,7 @@ class RPS < Sinatra::Base
     @my_hand = player.weapon_choice.type
     computer = Computer.new
     computer.weapon
-    @opponents_hand = computer.weapon_choice
+    @opponents_hand = computer.weapon_choice.type
     results = player.fights(computer)
     erb results
   end

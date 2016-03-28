@@ -18,7 +18,7 @@ class Player
 
 		if @weapon_choice.beats?(opponent.weapon_choice) 
 			:winner  
-		elsif @weapon_choice.type == opponent.weapon_choice
+		elsif @weapon_choice.type == opponent.weapon_choice.type
 			:draw
 		else
 		  :loser
